@@ -18,23 +18,22 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import fr.cesizen.domain.core.valueObjects.Link
 import fr.cesizen.presentation.composables.CategoryView
+import fr.cesizen.presentation.composables.DiagnosisResultView
+import fr.cesizen.presentation.composables.DiagnosisView
 import fr.cesizen.presentation.composables.HomeView
 import fr.cesizen.presentation.composables.NavBar
 import fr.cesizen.presentation.composables.PageView
 import fr.cesizen.presentation.composables.Support
 import fr.cesizen.presentation.theme.AppTheme
+import fr.cesizen.presentation.viewmodels.DiagnosisViewModel
 import kotlinx.serialization.Serializable
+import org.koin.compose.viewmodel.koinViewModel
 
-@Serializable
-object Home
-@Serializable
-data class Category(val href : String)
-@Serializable
-data class Page(val href : String)
-@Serializable
-object Diagnosis
-@Serializable
-object Profile
+@Serializable object Home
+@Serializable data class Category(val href : String)
+@Serializable data class Page(val href : String)
+@Serializable data class Diagnosis(val showResult : Boolean)
+@Serializable object Profile
 
 @Composable
 @Preview
@@ -49,22 +48,37 @@ fun App() {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = Home) {
                         composable<Home> {
-                            HomeView(onCategoryNavigation = { link -> navController.navigate(Category(link.href))  })
+                            HomeView(onNavigateToCategory = { link -> navController.navigate(Category(link.href))  })
                         }
                         composable<Category> {
                             CategoryView(
                                 link = Link(it.toRoute<Category>().href),
-                                onBackwardNavigation = { navController.navigate(Home) },
-                                onPageNavigation = { link -> navController.navigate(Page(link.href)) }
+                                onNavigateBackward = { navController.navigate(Home) },
+                                onNavigateToPage = { link -> navController.navigate(Page(link.href)) }
                             )
                         }
                         composable<Page> {
                             PageView(
                                 link = Link(it.toRoute<Page>().href),
-                                onBackwardNavigation = { link -> navController.navigate(Category(link.href)) },
+                                onNavigateBackward = { link -> navController.navigate(Category(link.href)) },
                             )
                         }
-                        composable<Diagnosis> {  }
+                        composable<Diagnosis> {
+
+                            val backStackEntry = remember(it) { navController.getBackStackEntry(Diagnosis(false)) }
+                            val viewModel = koinViewModel<DiagnosisViewModel>(viewModelStoreOwner = backStackEntry)
+                            when (it.toRoute<Diagnosis>().showResult) {
+                                false -> DiagnosisView(
+                                    onNavigateToDiagnosisResult = { navController.navigate(Diagnosis(true)) },
+                                    onNavigateBackward = { navController.navigate(Home) },
+                                    viewModel = viewModel
+                                )
+                                true -> DiagnosisResultView(
+                                    onNavigateBackward = { navController.navigate(Diagnosis(false)) },
+                                    viewModel = viewModel
+                                )
+                            }
+                        }
                         composable<Profile> {  }
                     }
 
@@ -77,9 +91,9 @@ fun App() {
                             modifier = Modifier.padding(8.dp)
                         )
                         NavBar(
-                            onHomePressed = { navController.navigate(Home) },
-                            onNewDiagnosticPressed = { navController.navigate(Diagnosis) },
-                            onProfilePressed = { navController.navigate(Profile) },
+                            onNavigateToHome = { navController.navigate(Home) },
+                            onNavigateToNewDiagnosis = { navController.navigate(Diagnosis(false)) },
+                            onNavigateToProfile = { navController.navigate(Profile) },
                             modifier = Modifier.padding(8.dp)
                         )
                     }

@@ -14,14 +14,14 @@ import kotlinx.coroutines.launch
 class CategoriesViewModel(
     private val apiService: ApiService
 ) : ViewModel() {
-    private val _state = MutableStateFlow<State<List<Category>>>(State.Loading())
-    val state = this._state.asStateFlow()
+    private val _categories = MutableStateFlow<State<List<Category>>>(State.Loading())
+    val categories = this._categories.asStateFlow()
 
     init {
         viewModelScope.launch {
             apiService
                 .tryRequest<Unit, List<Category>>(Link("/categories"))
-                .onSuccess { categories -> _state.update { State.Loaded(categories) }}
+                .onSuccess { categories -> _categories.update { State.Loaded(categories) }}
         }
     }
 }

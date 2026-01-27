@@ -29,7 +29,6 @@ val infrastructureModule = module {
     single {
         ApiService(
             client = get(),
-            json   = get()
         )
     }
 }

@@ -2,10 +2,11 @@ package fr.cesizen.presentation.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -36,11 +36,14 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun HomeView(
-    onCategoryNavigation : (Link) -> Unit,
-    viewModel            : CategoriesViewModel = koinViewModel(),
-    modifier             : Modifier = Modifier,
+    onNavigateToCategory : (Link) -> Unit,
+    viewModel : CategoriesViewModel = koinViewModel(),
+    modifier : Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.fillMaxSize()
+    ) {
         Image(
             painter = painterResource(Res.drawable.cesizen_logo),
             contentDescription = "Logo CESI Zen",
@@ -55,30 +58,30 @@ fun HomeView(
         )
         Surface(
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
-            val state by viewModel.state.collectAsState()
-            when (val state = state) {
+            val categories by viewModel.categories.collectAsState()
+            when (val categories = categories) {
                 is State.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 is State.Loaded ->
-                    if (state.value.isEmpty())
+                    if (categories.value.isEmpty())
                         Text(
                             text = "Aucune catégorie",
-                            style = MaterialTheme.typography.titleLarge.copy(fontStyle = FontStyle.Italic),
+                            style = MaterialTheme.typography.titleMedium.copy(fontStyle = FontStyle.Italic),
                             modifier = Modifier.padding(16.dp, 8.dp)
                         )
                     else
                         LazyColumn {
-                            items(state.value) {
+                            items(categories.value) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
-                                        .clickable { onCategoryNavigation(it.links.self) }
+                                        .clickable { onNavigateToCategory(it.links.self) }
                                         .padding(16.dp, 8.dp)
                                 ) {
                                     Text(
                                         text  = it.title,
-                                        style = MaterialTheme.typography.titleLarge
+                                        style = MaterialTheme.typography.titleMedium
                                     )
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Default.ArrowForward,

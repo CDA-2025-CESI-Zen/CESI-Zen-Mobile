@@ -13,12 +13,12 @@ class PageViewModel(
     private val apiService: ApiService
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<State<Page>>(State.Loading())
-    val state = this._state.asStateFlow()
+    private val _page = MutableStateFlow<State<Page>>(State.Loading())
+    val page = this._page.asStateFlow()
 
     suspend fun load(link : Link) =
         this.apiService
             .tryRequest<Unit, Page>(link)
-            .onSuccess { page -> _state.update { State.Loaded(page) }}
+            .onSuccess { page -> _page.update { State.Loaded(page) }}
 
 }

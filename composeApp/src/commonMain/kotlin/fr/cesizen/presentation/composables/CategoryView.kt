@@ -16,7 +16,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,69 +34,74 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun CategoryView(
-    link                 : Link,
-    onBackwardNavigation : () -> Unit,
-    onPageNavigation     : (Link) -> Unit,
-    viewModel            : CategoryViewModel = koinViewModel(),
-    modifier             : Modifier = Modifier,
+    link               : Link,
+    onNavigateBackward : () -> Unit,
+    onNavigateToPage   : (Link) -> Unit,
+    viewModel          : CategoryViewModel = koinViewModel(),
+    modifier           : Modifier = Modifier,
 ) {
     LaunchedEffect(Unit) {
         viewModel.load(link)
     }
 
-    val state by viewModel.state.collectAsState()
-    when (val state = state) {
+    val category by viewModel.category.collectAsState()
+    when (val category = category) {
         is State.Loading -> CircularProgressIndicator()
         is State.Loaded ->
-            Column {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     shadowElevation = 1.dp,
                     modifier = modifier.fillMaxWidth()
                 ) {
                     Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clickable { onBackwardNavigation() }
+                            .clickable { onNavigateBackward() }
                             .padding(16.dp, 8.dp)
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             tint = MaterialTheme.colorScheme.primary,
-                            contentDescription = state.value.title,
+                            contentDescription = category.value.title,
                             modifier = Modifier.size(32.dp)
                         )
                         Text(
-                            text = state.value.title,
-                            style = MaterialTheme.typography.titleLarge
+                            text = category.value.title,
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
                 }
-                Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = modifier.fillMaxSize().padding(16.dp)
+                ) {
                     Text(
                         text = "Pages",
                         color = MaterialTheme.colorScheme.secondary,
                         style = MaterialTheme.typography.titleLarge
                     )
-                    if (state.value.links.pages.isEmpty())
+                    if (category.value.links.pages.isEmpty())
                         Text(
                             text = "Aucune page dans cette catégorie !",
-                            style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
+                            style = MaterialTheme.typography.titleMedium.copy(fontStyle = FontStyle.Italic),
                             modifier = Modifier.padding(16.dp).align(Alignment.CenterHorizontally)
                         )
                     else Surface(
                         shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         LazyColumn(modifier = Modifier.padding(16.dp, 8.dp)) {
-                            items(state.value.links.pages) {
+                            items(category.value.links.pages) {
                                 Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.clickable { onPageNavigation(it) }
+                                    modifier = Modifier.clickable { onNavigateToPage(it) }
                                 ) {
                                     Text(
                                         text  = it.title ?: "Page sans titre",
-                                        style = MaterialTheme.typography.titleLarge
+                                        style = MaterialTheme.typography.titleMedium
                                     )
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Default.ArrowForward,

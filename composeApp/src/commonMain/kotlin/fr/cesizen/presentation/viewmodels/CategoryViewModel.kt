@@ -13,12 +13,12 @@ class CategoryViewModel(
     private val apiService: ApiService
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<State<Category>>(State.Loading())
-    val state = this._state.asStateFlow()
+    private val _category = MutableStateFlow<State<Category>>(State.Loading())
+    val category = this._category.asStateFlow()
 
     suspend fun load(link : Link) =
         this.apiService
             .tryRequest<Unit, Category>(link)
-            .onSuccess { category -> _state.update { State.Loaded(category) }}
+            .onSuccess { category -> _category.update { State.Loaded(category) }}
 
 }

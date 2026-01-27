@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(
-    val mailAddress : String,
-    val links       : Links,
+    val mailAddress         : String,
+    val lastDiagnosisResult : Int?,
+    val links               : Links,
 )
