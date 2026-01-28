@@ -6,6 +6,7 @@ import fr.cesizen.infrastructure.valueObjects.ApiException
 import fr.cesizen.infrastructure.valueObjects.ApiResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
@@ -13,6 +14,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -74,31 +76,31 @@ class ApiService(
     suspend inline fun <reified T> safeRequest(
         crossinline request: suspend () -> HttpResponse
     ): Result<T> {
-        //return try {
+        return try {
             val response = request()
 
-            //return try {
+            return try {
                 val apiResponse = response.body<ApiResponse<T>>()
 
                 return if (T::class == Unit::class && apiResponse.successful) Result.success(Unit as T)
                 else apiResponse.asResult()
 
-            //}catch (_ : Exception) {
-            //   when (response.status) {
-            //       HttpStatusCode.Unauthorized -> Result.failure(ApiException.Unauthorized())
-            //       HttpStatusCode.Forbidden    -> Result.failure(ApiException.Forbidden())
-            //       in HttpStatusCode.InternalServerError..HttpStatusCode.RequestTimeout ->
-            //           Result.failure(ApiException.ServerError())
-//
-            //        else -> Result.failure(ApiException.Unknown())
-            //    }
-            //}
+            }catch (_ : Exception) {
+               when (response.status) {
+                   HttpStatusCode.Unauthorized -> Result.failure(ApiException.Unauthorized())
+                   HttpStatusCode.Forbidden    -> Result.failure(ApiException.Forbidden())
+                   in HttpStatusCode.InternalServerError..HttpStatusCode.RequestTimeout ->
+                       Result.failure(ApiException.ServerError())
 
-        //} catch (_ : HttpRequestTimeoutException) {
-        //    Result.failure(ApiException.Unknown())
-        //} catch (_ : Exception) {
-        //    Result.failure(ApiException.Unknown())
-        //}
+                    else -> Result.failure(ApiException.Unknown())
+                }
+            }
+
+        } catch (_ : HttpRequestTimeoutException) {
+            Result.failure(ApiException.Unknown())
+        } catch (_ : Exception) {
+            Result.failure(ApiException.Unknown())
+        }
     }
 
     fun CesiZenHttpMethod.toKtor(): HttpMethod =
