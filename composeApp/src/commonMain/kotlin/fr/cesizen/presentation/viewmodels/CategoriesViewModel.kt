@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 class CategoriesViewModel(
     private val apiService: ApiService
 ) : ViewModel() {
+
     private val _categories = MutableStateFlow<State<List<Category>>>(State.Loading())
     val categories = this._categories.asStateFlow()
 

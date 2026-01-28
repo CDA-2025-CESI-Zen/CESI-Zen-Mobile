@@ -56,14 +56,14 @@ fun HomeView(
             color = MaterialTheme.colorScheme.secondary,
             style = MaterialTheme.typography.titleLarge
         )
-        Surface(
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            val categories by viewModel.categories.collectAsState()
-            when (val categories = categories) {
-                is State.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                is State.Loaded ->
+        val categories by viewModel.categories.collectAsState()
+        when (val categories = categories) {
+            is State.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            is State.Loaded ->
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     if (categories.value.isEmpty())
                         Text(
                             text = "Aucune catégorie",

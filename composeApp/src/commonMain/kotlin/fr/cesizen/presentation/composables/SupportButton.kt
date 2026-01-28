@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 
@@ -25,7 +24,7 @@ fun Support(
     modifier : Modifier = Modifier
 ) {
     Surface(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(12.dp),
         shadowElevation = 1.dp,
         modifier = modifier
     ) {
@@ -34,7 +33,7 @@ fun Support(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable { onSupportPressed() }
-                .padding(8.dp, 6.dp)
+                .padding(12.dp, 6.dp)
         ) {
             Icon(
                 imageVector = Icons.Filled.SupportAgent,

@@ -20,27 +20,45 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import fr.cesizen.presentation.services.ToastService
 import fr.cesizen.presentation.viewmodels.DiagnosisViewModel
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun DiagnosisResultView(
     onNavigateBackward : () -> Unit,
+    toastService : ToastService = koinInject(),
     viewModel : DiagnosisViewModel = koinViewModel(),
     modifier : Modifier = Modifier,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         val isAuthenticated by viewModel.isAuthenticated.collectAsState(false)
         val analysis by viewModel.analysis.collectAsState(null)
+        val previousScore by viewModel.previousScore.collectAsState(null)
         val currentScore by viewModel.currentScore.collectAsState(null)
-        val changeRate by viewModel.changeRate.collectAsState(null)
         val totalScore by viewModel.totalScore.collectAsState(null)
+
+        val coroutineScope = rememberCoroutineScope()
+        val changeRate = remember(currentScore) {
+            previousScore?.takeIf { it != 0 }?.let { previousScore ->
+                currentScore?.let { currentScore ->
+                    (((currentScore - previousScore) / previousScore.toFloat()) * 100).toInt()
+                }
+            }
+        }
 
         Surface(
             shape = RoundedCornerShape(12.dp),
@@ -87,14 +105,19 @@ fun DiagnosisResultView(
                         Text(
                             text = buildAnnotatedString {
                                 append("Votre score est de ")
-                                pushStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary))
+                                pushStyle(style = SpanStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.secondary)
+                                )
                                 append("$currentScore/$totalScore")
 
-                                if (changeRate != null)
-                                    appendLine("$changeRate%")
-
                                 pop()
-                                append(".")
+                                appendLine(".")
+
+                                if (changeRate != null) {
+                                    pushStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary))
+                                    append("(${if (changeRate >= 0) "+" else ""}$changeRate% depuis la dernière fois)")
+                                }
                             },
                         )
                     if (analysis == null)
@@ -106,9 +129,25 @@ fun DiagnosisResultView(
                     else Text(text = analysis!!.content)
                 }
             }
+
+            var resultSaved by remember { mutableStateOf(false) }
             if (isAuthenticated)
                 Button(
-                    onClick = { viewModel.saveResult() },
+                    enabled = !resultSaved,
+                    onClick = {
+                        coroutineScope.launch {
+                            viewModel.trySaveResult().fold(
+                                onSuccess = {
+                                    resultSaved = true
+                                },
+                                onFailure = {
+                                    it.message?.let { message ->
+                                        toastService.showToast(message)
+                                    }
+                                }
+                            )
+                        }
+                    },
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors().copy(
                         containerColor = MaterialTheme.colorScheme.surface,

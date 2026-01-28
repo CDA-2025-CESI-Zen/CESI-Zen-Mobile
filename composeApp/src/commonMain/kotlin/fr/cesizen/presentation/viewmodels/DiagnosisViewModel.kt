@@ -28,6 +28,7 @@ class DiagnosisViewModel(
 
     val isAuthenticated = this.apiService.isAuthenticated
 
+    /** Total score based on the [diagnosis] items. */
     val totalScore = this._diagnosis.map { diagnosis ->
         when (diagnosis) {
             is State.Loaded -> diagnosis.value.items.sumOf { it.score }
@@ -35,6 +36,10 @@ class DiagnosisViewModel(
         }
     }
 
+    /** Previous score. Equals to `null` if there is no active session. */
+    val previousScore = this.apiService.session.map { it?.lastDiagnosisResult }
+
+    /** Score based on the [diagnosis] items and the [checkedItemIds]. */
     val currentScore = this._diagnosis.combine(this._checkedItemIds) { diagnosis, checkedItemIds ->
         return@combine when (diagnosis) {
             is State.Loaded -> {
@@ -46,6 +51,7 @@ class DiagnosisViewModel(
         }
     }
 
+    /** Analysis based on the [diagnosis] analyses and the [currentScore] */
     val analysis = this._diagnosis.combine(this.currentScore) { diagnosis, currentScore ->
         return@combine when (diagnosis) {
             is State.Loaded -> {
@@ -57,26 +63,22 @@ class DiagnosisViewModel(
         }
     }
 
-    val changeRate = this.apiService.session.combine(this.currentScore) { session, currentScore ->
-        session?.user?.lastDiagnosisResult?.takeIf { it != 0 }?.let { previousScore ->
-            currentScore?.let { currentScore ->
-                (((currentScore - previousScore) / previousScore.toFloat()) * 100).toInt()
-            }
-        }
-    }
-
+    /** Toggles a diagnosis item on or off. */
     fun toggleItem(id: UInt) =
         this._checkedItemIds.update {
             (if (id in it) it - id else it + id)
         }
 
-    @Serializable private data class SaveDiagnosisResultDto(val diagnosisItemIds : Set<UInt>)
-    fun saveResult() =
-        viewModelScope.launch {
-            apiService.tryRequestWithSession<SaveDiagnosisResultDto, Unit>(
-                link = { this.user.links.saveDiagnosisResult },
-                body = SaveDiagnosisResultDto(checkedItemIds.value)
-            )
+    @Serializable data class SaveDiagnosisResultDto(val diagnosisItemIds : Set<UInt>)
+    @Serializable data class DiagnosisResultDto(val newScore : Int)
+
+    /** Tries to save the [checkedItemIds] and [currentScore] to the active session. */
+    suspend fun trySaveResult() =
+        this.apiService.tryRequestWithSession<SaveDiagnosisResultDto, DiagnosisResultDto>(
+            link = { this.links.saveDiagnosisResult },
+            body = SaveDiagnosisResultDto(checkedItemIds.value)
+        ).onSuccess { diagnosisResult ->
+            this.apiService.session.update { it!!.copy(lastDiagnosisResult = diagnosisResult.newScore) }
         }
 
 

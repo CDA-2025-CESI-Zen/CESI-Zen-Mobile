@@ -15,6 +15,7 @@ val infrastructureModule = module {
         Json {
             ignoreUnknownKeys = true
             isLenient         = true
+            explicitNulls     = false
         }
     }
 

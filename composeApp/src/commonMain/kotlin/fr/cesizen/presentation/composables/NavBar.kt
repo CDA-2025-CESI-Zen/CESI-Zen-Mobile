@@ -16,18 +16,24 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import fr.cesizen.infrastructure.services.ApiService
+import org.koin.compose.koinInject
 
 
 @Composable
 fun NavBar(
     onNavigateToHome : () -> Unit,
     onNavigateToNewDiagnosis : () -> Unit,
+    onNavigateToSignIn : () -> Unit,
     onNavigateToProfile : () -> Unit,
+    api : ApiService = koinInject(),
     modifier : Modifier = Modifier
 ) {
     Surface(
@@ -37,16 +43,16 @@ fun NavBar(
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.padding(32.dp, 8.dp)
+            modifier = Modifier.padding(24.dp, 8.dp)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.clickable { onNavigateToHome() }
+                modifier = Modifier.weight(1f).clickable { onNavigateToHome() }
             ) {
                 Icon(
                     imageVector = Icons.Filled.Home,
                     contentDescription = "Accueil",
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(32.dp)
                 )
                 Text(
                     text = "ACCUEIL",
@@ -56,12 +62,12 @@ fun NavBar(
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.clickable { onNavigateToNewDiagnosis() }
+                modifier = Modifier.weight(1f).clickable { onNavigateToNewDiagnosis() }
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.PlaylistAdd,
                     contentDescription = "Nouveau diagnostic",
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(32.dp)
                 )
                 Text(
                     text = "DIAGNOSTIC",
@@ -69,19 +75,36 @@ fun NavBar(
                 )
             }
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.clickable { onNavigateToProfile() }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Person,
-                    contentDescription = "Profil",
-                    modifier = Modifier.size(48.dp)
-                )
-                Text(
-                    text = "PROFIL",
-                    style = TextStyle(fontWeight = FontWeight.Bold)
-                )
+            val isAuthenticated by api.isAuthenticated.collectAsState(false)
+            when (isAuthenticated) {
+                false -> Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f).clickable { onNavigateToSignIn() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = "Se connecter",
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Text(
+                        text = "CONNEXION",
+                        style = TextStyle(fontWeight = FontWeight.Bold)
+                    )
+                }
+                true -> Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f).clickable { onNavigateToProfile() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = "Profil",
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Text(
+                        text = "PROFIL",
+                        style = TextStyle(fontWeight = FontWeight.Bold)
+                    )
+                }
             }
         }
     }

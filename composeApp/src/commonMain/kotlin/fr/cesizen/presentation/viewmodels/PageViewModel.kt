@@ -16,7 +16,8 @@ class PageViewModel(
     private val _page = MutableStateFlow<State<Page>>(State.Loading())
     val page = this._page.asStateFlow()
 
-    suspend fun load(link : Link) =
+    /** Tries to load the page at the given [link]. */
+    suspend fun tryLoad(link : Link) =
         this.apiService
             .tryRequest<Unit, Page>(link)
             .onSuccess { page -> _page.update { State.Loaded(page) }}

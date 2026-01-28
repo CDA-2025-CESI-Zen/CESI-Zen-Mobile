@@ -1,9 +1,9 @@
 package fr.cesizen.infrastructure.services
 
+import fr.cesizen.domain.aggregates.users.User
 import fr.cesizen.domain.core.valueObjects.Link
 import fr.cesizen.infrastructure.valueObjects.ApiException
 import fr.cesizen.infrastructure.valueObjects.ApiResponse
-import fr.cesizen.infrastructure.valueObjects.Session
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.header
@@ -13,9 +13,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -29,9 +27,10 @@ class ApiService(
         const val API_URL : String = "http://10.0.2.2:5000"
     }
 
-    val session = MutableStateFlow<Session?>(null)
+    val session = MutableStateFlow<User?>(null)
     val isAuthenticated = this.session.map { it != null }
 
+    /** Tries to fetch the API at the given path [link]. */
     suspend inline fun <reified In, reified Out> tryRequest(
         link : Link,
         body : In? = null
@@ -45,8 +44,9 @@ class ApiService(
             }
         }
 
+    /** Tries to fetch the API at the given path [link] using the current [session] if any. */
     suspend inline fun <reified In, reified Out> tryRequestWithSession(
-        noinline link : Session.() -> Link,
+        noinline link : User.() -> Link,
                  body : In? = null
     ): Result<Out> {
         val currentSession = session.value
@@ -55,7 +55,7 @@ class ApiService(
         val resolvedLink = currentSession.link()
 
         return safeRequest<Out> {
-            client.request(resolvedLink.href) {
+            client.request(API_URL + resolvedLink.href) {
 
                 method = resolvedLink.method.toKtor()
                 contentType(ContentType.Application.Json)
@@ -64,8 +64,9 @@ class ApiService(
                 body?.let { setBody(it) }
             }
         }.onFailure {
-            if (it is ApiException.Unauthorized) {
-                session.update { null }
+            when (it) {
+                is ApiException.Unauthorized, is ApiException.Forbidden ->
+                    session.update { null }
             }
         }
     }
@@ -73,23 +74,31 @@ class ApiService(
     suspend inline fun <reified T> safeRequest(
         crossinline request: suspend () -> HttpResponse
     ): Result<T> {
-        val response = request()
+        //return try {
+            val response = request()
 
-        if (response.status.isSuccess())
-            return response.body<ApiResponse<T>>().asResult()
+            //return try {
+                val apiResponse = response.body<ApiResponse<T>>()
 
-        return try {
-            response.body<ApiResponse<T>>().asResult()
-        } catch (_ : Exception) {
-            when (response.status) {
-                HttpStatusCode.Unauthorized -> Result.failure(ApiException.Unauthorized())
-                HttpStatusCode.Forbidden    -> Result.failure(ApiException.Forbidden())
-                in HttpStatusCode.InternalServerError..HttpStatusCode.RequestTimeout ->
-                    Result.failure(ApiException.ServerError())
+                return if (T::class == Unit::class && apiResponse.successful) Result.success(Unit as T)
+                else apiResponse.asResult()
 
-                else -> Result.failure(ApiException.Unknown())
-            }
-        }
+            //}catch (_ : Exception) {
+            //   when (response.status) {
+            //       HttpStatusCode.Unauthorized -> Result.failure(ApiException.Unauthorized())
+            //       HttpStatusCode.Forbidden    -> Result.failure(ApiException.Forbidden())
+            //       in HttpStatusCode.InternalServerError..HttpStatusCode.RequestTimeout ->
+            //           Result.failure(ApiException.ServerError())
+//
+            //        else -> Result.failure(ApiException.Unknown())
+            //    }
+            //}
+
+        //} catch (_ : HttpRequestTimeoutException) {
+        //    Result.failure(ApiException.Unknown())
+        //} catch (_ : Exception) {
+        //    Result.failure(ApiException.Unknown())
+        //}
     }
 
     fun CesiZenHttpMethod.toKtor(): HttpMethod =

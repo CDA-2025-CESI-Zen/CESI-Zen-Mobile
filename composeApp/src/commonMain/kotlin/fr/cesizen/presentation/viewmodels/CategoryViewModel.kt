@@ -16,7 +16,8 @@ class CategoryViewModel(
     private val _category = MutableStateFlow<State<Category>>(State.Loading())
     val category = this._category.asStateFlow()
 
-    suspend fun load(link : Link) =
+    /** Tries to load the category at the given [link]. */
+    suspend fun tryLoad(link : Link) =
         this.apiService
             .tryRequest<Unit, Category>(link)
             .onSuccess { category -> _category.update { State.Loaded(category) }}
