@@ -1,4 +1,4 @@
-package fr.cesizen.presentation.composables
+package fr.cesizen.presentation.composables.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

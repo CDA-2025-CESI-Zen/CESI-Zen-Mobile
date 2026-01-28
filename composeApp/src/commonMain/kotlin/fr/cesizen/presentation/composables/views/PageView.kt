@@ -1,4 +1,4 @@
-package fr.cesizen.presentation.composables
+package fr.cesizen.presentation.composables.views
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

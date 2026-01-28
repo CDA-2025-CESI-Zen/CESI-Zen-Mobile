@@ -34,25 +34,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.cesizen.presentation.composables.View
+import fr.cesizen.presentation.composables.views.View
 import fr.cesizen.presentation.services.ToastService
-import fr.cesizen.presentation.viewmodels.SignUpViewModel
+import fr.cesizen.presentation.viewmodels.ForgottenPasswordViewModel
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun SignUpView(
+fun ForgottenPasswordView(
     onNavigateBackward : () -> Unit,
-    onNavigateToSignIn : () -> Unit,
-    onSignUp : () -> Unit,
+    onSignIn : () -> Unit,
     toastService : ToastService = koinInject(),
-    viewModel : SignUpViewModel = koinViewModel(),
+    viewModel : ForgottenPasswordViewModel = koinViewModel(),
     modifier : Modifier = Modifier,
 ) {
     View(
         title = "Mon compte",
-        header = "S'enregistrer",
+        header = "Mot de passe oublié",
         onNavigateBackward = onNavigateBackward,
         modifier = modifier,
     ) {
@@ -97,7 +96,7 @@ fun SignUpView(
                     enabled = mailAddress.matches(emailRegex),
                     onClick = {
                         coroutineScope.launch {
-                            viewModel.tryRequestRegister(mailAddress).fold(
+                            viewModel.tryRequestPasswordReset(mailAddress).fold(
                                 onSuccess = { toastService.showToast("Code PIN envoyé !") },
                                 onFailure = {
                                     it.message?.let { message ->
@@ -134,7 +133,7 @@ fun SignUpView(
             TextField(
                 value         = password,
                 onValueChange = { password = it },
-                placeholder   = { Text("mot de passe") },
+                placeholder   = { Text("nouveau mot de passe") },
                 singleLine    = true,
                 trailingIcon  = {
                     IconButton(
@@ -170,46 +169,27 @@ fun SignUpView(
                 keyboardOptions      = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 modifier             = Modifier.fillMaxWidth()
             )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Button(
-                    onClick = { onNavigateToSignIn() },
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors().copy(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "Se connecter",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            viewModel.trySignUp(mailAddress, password, pin).fold(
-                                onSuccess = { onSignUp() },
-                                onFailure = {
-                                    it.message?.let { message ->
-                                        toastService.showToast(message)
-                                    }
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        viewModel.tryResetPassword(mailAddress, password, pin).fold(
+                            onSuccess = { onSignIn() },
+                            onFailure = {
+                                it.message?.let { message ->
+                                    toastService.showToast(message)
                                 }
-                            )
-                        }
-                    },
-                    enabled = mailAddress.matches(emailRegex) && pin.length == 8 && pin.all { it.isDigit() } && password.isNotBlank() && password == passwordConfirmation,
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "S'enregistrer",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
+                            }
+                        )
+                    }
+                },
+                enabled = mailAddress.matches(emailRegex) && pin.length == 8 && pin.all { it.isDigit() } && password.isNotBlank() && password == passwordConfirmation,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = "Confirmer",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }

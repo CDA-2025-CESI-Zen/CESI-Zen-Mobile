@@ -34,24 +34,25 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.cesizen.presentation.composables.View
+import fr.cesizen.presentation.composables.views.View
 import fr.cesizen.presentation.services.ToastService
-import fr.cesizen.presentation.viewmodels.ForgottenPasswordViewModel
+import fr.cesizen.presentation.viewmodels.SignUpViewModel
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ForgottenPasswordView(
+fun SignUpView(
     onNavigateBackward : () -> Unit,
-    onSignIn : () -> Unit,
+    onNavigateToSignIn : () -> Unit,
+    onSignUp : () -> Unit,
     toastService : ToastService = koinInject(),
-    viewModel : ForgottenPasswordViewModel = koinViewModel(),
+    viewModel : SignUpViewModel = koinViewModel(),
     modifier : Modifier = Modifier,
 ) {
     View(
         title = "Mon compte",
-        header = "Mot de passe oublié",
+        header = "S'enregistrer",
         onNavigateBackward = onNavigateBackward,
         modifier = modifier,
     ) {
@@ -96,7 +97,7 @@ fun ForgottenPasswordView(
                     enabled = mailAddress.matches(emailRegex),
                     onClick = {
                         coroutineScope.launch {
-                            viewModel.tryRequestPasswordReset(mailAddress).fold(
+                            viewModel.tryRequestRegister(mailAddress).fold(
                                 onSuccess = { toastService.showToast("Code PIN envoyé !") },
                                 onFailure = {
                                     it.message?.let { message ->
@@ -133,7 +134,7 @@ fun ForgottenPasswordView(
             TextField(
                 value         = password,
                 onValueChange = { password = it },
-                placeholder   = { Text("nouveau mot de passe") },
+                placeholder   = { Text("mot de passe") },
                 singleLine    = true,
                 trailingIcon  = {
                     IconButton(
@@ -169,27 +170,46 @@ fun ForgottenPasswordView(
                 keyboardOptions      = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 modifier             = Modifier.fillMaxWidth()
             )
-            Button(
-                onClick = {
-                    coroutineScope.launch {
-                        viewModel.tryResetPassword(mailAddress, password, pin).fold(
-                            onSuccess = { onSignIn() },
-                            onFailure = {
-                                it.message?.let { message ->
-                                    toastService.showToast(message)
-                                }
-                            }
-                        )
-                    }
-                },
-                enabled = mailAddress.matches(emailRegex) && pin.length == 8 && pin.all { it.isDigit() } && password.isNotBlank() && password == passwordConfirmation,
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "Confirmer",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Button(
+                    onClick = { onNavigateToSignIn() },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors().copy(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "Se connecter",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            viewModel.trySignUp(mailAddress, password, pin).fold(
+                                onSuccess = { onSignUp() },
+                                onFailure = {
+                                    it.message?.let { message ->
+                                        toastService.showToast(message)
+                                    }
+                                }
+                            )
+                        }
+                    },
+                    enabled = mailAddress.matches(emailRegex) && pin.length == 8 && pin.all { it.isDigit() } && password.isNotBlank() && password == passwordConfirmation,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "S'enregistrer",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
             }
         }
     }

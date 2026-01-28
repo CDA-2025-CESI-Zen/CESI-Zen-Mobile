@@ -42,7 +42,7 @@ fun App() {
                         modifier = Modifier.align(Alignment.BottomCenter)
                     ) {
                         Support(
-                            onSupportPressed = {  },
+                            onSupportPressed = { navViewController.navigate(Support) },
                             modifier = Modifier.padding(8.dp)
                         )
                         NavBar(

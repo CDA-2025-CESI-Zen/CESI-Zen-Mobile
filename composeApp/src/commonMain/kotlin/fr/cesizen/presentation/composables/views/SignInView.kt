@@ -28,7 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import fr.cesizen.presentation.composables.View
+import fr.cesizen.presentation.composables.views.View
 import fr.cesizen.presentation.services.ToastService
 import fr.cesizen.presentation.viewmodels.SignInViewModel
 import kotlinx.coroutines.launch

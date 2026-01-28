@@ -10,6 +10,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import fr.cesizen.domain.core.valueObjects.Link
+import fr.cesizen.presentation.composables.views.CategoryView
+import fr.cesizen.presentation.composables.views.DiagnosisResultView
+import fr.cesizen.presentation.composables.views.DiagnosisView
+import fr.cesizen.presentation.composables.views.HomeView
+import fr.cesizen.presentation.composables.views.PageView
+import fr.cesizen.presentation.composables.views.ProfileView
+import fr.cesizen.presentation.composables.views.SupportView
 import fr.cesizen.presentation.viewmodels.DiagnosisViewModel
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
@@ -22,6 +29,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Serializable object SignIn
 @Serializable object ForgottenPassword
 @Serializable object SignUp
+@Serializable object Support
 
 @Composable
 fun NavHostController.HandleViews() {
@@ -29,7 +37,7 @@ fun NavHostController.HandleViews() {
     val navController = this
     NavHost(navController = navController, startDestination = Home) {
         composable<Home> {
-            HomeView(onNavigateToCategory = { link -> navController.navigate(Category(link.href))  })
+            HomeView(onNavigateToCategory = { link -> navController.navigate(Category(link.href)) })
         }
         composable<Category> {
             CategoryView(
@@ -85,6 +93,11 @@ fun NavHostController.HandleViews() {
                 onNavigateBackward = { navController.navigate(SignIn) },
                 onNavigateToSignIn = { navController.navigate(SignIn) },
                 onSignUp = { navController.navigate(Profile) }
+            )
+        }
+        composable<Support> {
+            SupportView(
+                onNavigateBackward = { navController.navigate(Home) },
             )
         }
     }
