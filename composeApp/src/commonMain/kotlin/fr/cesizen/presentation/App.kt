@@ -1,5 +1,6 @@
 package fr.cesizen.presentation
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,7 @@ import fr.cesizen.presentation.theme.AppTheme
 @Composable
 @Preview
 fun App() {
-    AppTheme {
+    AppTheme(darkTheme = isSystemInDarkTheme()) {
         Box(modifier = Modifier.fillMaxSize()) {
             Surface(
                 color = MaterialTheme.colorScheme.background,

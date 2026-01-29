@@ -106,7 +106,7 @@ fun DiagnosisResultView(
                             text = buildAnnotatedString {
                                 append("Votre score est de ")
                                 pushStyle(style = SpanStyle(
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.secondary)
                                 )
                                 append("$currentScore/$totalScore")
