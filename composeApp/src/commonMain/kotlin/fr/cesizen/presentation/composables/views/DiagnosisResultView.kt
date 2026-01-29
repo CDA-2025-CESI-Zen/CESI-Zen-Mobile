@@ -124,7 +124,6 @@ fun DiagnosisResultView(
                         Text(
                             text = "Aucune analyse disponible !",
                             style = MaterialTheme.typography.titleMedium.copy(fontStyle = FontStyle.Italic),
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     else Text(text = analysis!!.content)
                 }
