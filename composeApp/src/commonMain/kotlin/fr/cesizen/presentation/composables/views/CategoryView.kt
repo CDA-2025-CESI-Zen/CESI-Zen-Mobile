@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.cesizen.domain.core.valueObjects.Link
 import fr.cesizen.presentation.core.State
@@ -78,11 +79,16 @@ fun CategoryView(
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.clickable { onNavigateToPage(it) }
+                                modifier = Modifier
+                                    .clickable { onNavigateToPage(it) }
+                                    .padding(16.dp, 8.dp)
                             ) {
                                 Text(
                                     text  = it.title ?: "Page sans titre",
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                    modifier = Modifier.weight(1f, fill = false)
                                 )
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Default.ArrowForward,

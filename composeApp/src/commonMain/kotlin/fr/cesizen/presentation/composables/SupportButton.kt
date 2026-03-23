@@ -25,6 +25,7 @@ fun Support(
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
+        shadowElevation = 1.dp,
         modifier = modifier
     ) {
         Row(

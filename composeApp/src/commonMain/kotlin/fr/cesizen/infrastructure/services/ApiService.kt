@@ -85,7 +85,7 @@ class ApiService(
                 return if (T::class == Unit::class && apiResponse.successful) Result.success(Unit as T)
                 else apiResponse.asResult()
 
-            }catch (_ : Exception) {
+            } catch (_ : Exception) {
                when (response.status) {
                    HttpStatusCode.Unauthorized -> Result.failure(ApiException.Unauthorized())
                    HttpStatusCode.Forbidden    -> Result.failure(ApiException.Forbidden())
