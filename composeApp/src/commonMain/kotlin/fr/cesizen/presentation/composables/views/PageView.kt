@@ -2,16 +2,17 @@ package fr.cesizen.presentation.composables.views
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import fr.cesizen.domain.core.valueObjects.Link
 import fr.cesizen.presentation.core.State
 import fr.cesizen.presentation.services.ToastService
@@ -39,7 +40,7 @@ fun PageView(
     when (val page = page) {
         is State.Loading ->
             Box(modifier = Modifier.fillMaxSize()) {
-                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         is State.Loaded -> {
 
@@ -51,6 +52,7 @@ fun PageView(
                 Text(
                     text = page.value.content,
                     textAlign = TextAlign.Justify,
+                    modifier = Modifier.verticalScroll(rememberScrollState())
                 )
             }
         }

@@ -21,10 +21,11 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Support(
     onSupportPressed : () -> Unit,
-    modifier : Modifier = Modifier
+    modifier : Modifier = Modifier,
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
+        shadowElevation = 1.dp,
         modifier = modifier
     ) {
         Row(

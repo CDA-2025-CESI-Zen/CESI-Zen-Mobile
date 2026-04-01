@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cesizen.composeapp.generated.resources.Res
 import cesizen.composeapp.generated.resources.cesizen_logo
@@ -74,14 +75,18 @@ fun HomeView(
                         LazyColumn {
                             items(categories.value) {
                                 Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
                                         .clickable { onNavigateToCategory(it.links.self) }
                                         .padding(16.dp, 8.dp)
                                 ) {
                                     Text(
-                                        text  = it.title,
-                                        style = MaterialTheme.typography.titleMedium
+                                        text = it.title,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        overflow = TextOverflow.Ellipsis,
+                                        maxLines = 1,
+                                        modifier = Modifier.weight(1f, fill = false)
                                     )
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Default.ArrowForward,

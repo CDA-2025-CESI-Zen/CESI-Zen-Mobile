@@ -30,6 +30,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.cesizen.presentation.services.ToastService
 import fr.cesizen.presentation.viewmodels.DiagnosisViewModel
@@ -125,7 +126,10 @@ fun DiagnosisResultView(
                             text = "Aucune analyse disponible !",
                             style = MaterialTheme.typography.titleMedium.copy(fontStyle = FontStyle.Italic),
                         )
-                    else Text(text = analysis!!.content)
+                    else Text(
+                        text = analysis!!.content,
+                        textAlign = TextAlign.Justify
+                    )
                 }
             }
 

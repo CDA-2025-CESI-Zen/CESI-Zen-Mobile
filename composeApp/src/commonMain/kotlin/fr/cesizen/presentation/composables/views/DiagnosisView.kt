@@ -3,10 +3,8 @@ package fr.cesizen.presentation.composables.views
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,7 +36,7 @@ fun DiagnosisView(
     val diagnosis by viewModel.diagnosis.collectAsState()
     when (val diagnosis = diagnosis) {
         is State.Loading -> Box(modifier = Modifier.fillMaxSize()) {
-            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
         is State.Loaded -> {
             View(
@@ -51,7 +49,7 @@ fun DiagnosisView(
                 LazyColumn {
                     items(diagnosis.value.items) {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                            verticalAlignment = Alignment.Top,
                             modifier = Modifier
                                 .clickable { viewModel.toggleItem(it.id) }
                                 .padding(end = 8.dp)
@@ -66,7 +64,8 @@ fun DiagnosisView(
                             )
                             Text(
                                 text  = it.label,
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(top = 10.dp)
                             )
                         }
                     }
@@ -83,12 +82,10 @@ fun DiagnosisView(
                             ) {
                                 Text(
                                     text = "CONFIRMER",
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
                                 )
                             }
                         }
-
-                        Spacer(modifier = Modifier.height(256.dp))
                     }
                 }
             }
