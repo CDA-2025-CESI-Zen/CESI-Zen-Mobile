@@ -1,6 +1,6 @@
 ### Prérequis
 
-Afin d'afficher et de pouvoir intéragir avec le contenu, l'API Front-Office doit être exécutée et ouverte sur le port https `5001`.
+Afin d'afficher et de pouvoir intéragir avec le contenu, l'API Front-Office doit être exécutée et ouverte sur le port https `8443`.
 
 ### Création et exécution de l'application Android CESI Zen
 
