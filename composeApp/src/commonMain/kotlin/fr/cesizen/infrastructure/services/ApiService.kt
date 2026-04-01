@@ -26,7 +26,7 @@ class ApiService(
 ) {
 
     companion object {
-        const val API_URL : String = "https://10.0.2.2:5001"
+        const val API_URL : String = "https://10.0.2.2:8443"
     }
 
     val session = MutableStateFlow<User?>(null)
