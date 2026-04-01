@@ -3,7 +3,6 @@ package fr.cesizen.presentation.theme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import cesizen.composeapp.generated.resources.Res
 import cesizen.composeapp.generated.resources.marianne_bold
 import cesizen.composeapp.generated.resources.marianne_extra_bold

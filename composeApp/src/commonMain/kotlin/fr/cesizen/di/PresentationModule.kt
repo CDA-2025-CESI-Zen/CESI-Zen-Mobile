@@ -1,5 +1,6 @@
 package fr.cesizen.di
 
+import fr.cesizen.presentation.services.DialerService
 import fr.cesizen.presentation.services.ToastService
 import fr.cesizen.presentation.viewmodels.CategoriesViewModel
 import fr.cesizen.presentation.viewmodels.CategoryViewModel
@@ -17,6 +18,7 @@ expect val platformPresentationModule : Module
 val presentationModule = module {
 
     single { ToastService() }
+    single { DialerService() }
 
     viewModelOf(::CategoriesViewModel)
     viewModelOf(::CategoryViewModel)

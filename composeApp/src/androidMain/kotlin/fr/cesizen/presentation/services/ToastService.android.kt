@@ -1,15 +1,6 @@
 package fr.cesizen.presentation.services
 
 import android.widget.Toast
-import android.app.Activity
-
-private var activityProvider: () -> Activity? = {
-    null
-}
-
-fun setActivityProvider(provider: () -> Activity?) {
-    activityProvider = provider
-}
 
 actual open class ToastService actual constructor() {
     actual fun showToast(message: String) {

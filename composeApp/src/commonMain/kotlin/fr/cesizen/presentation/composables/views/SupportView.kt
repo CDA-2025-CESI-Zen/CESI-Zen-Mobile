@@ -1,5 +1,6 @@
 package fr.cesizen.presentation.composables.views
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,11 +22,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import fr.cesizen.presentation.services.DialerService
+import org.koin.compose.koinInject
 
 @Composable
 fun SupportView(
     onNavigateBackward : () -> Unit,
     modifier : Modifier = Modifier,
+    dialer : DialerService = koinInject(),
 ) {
     View(
         title = "Un problème ?",
@@ -60,6 +64,9 @@ fun SupportView(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        dialer.openDialer(phoneNumber = "+33301020304")
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Phone,
@@ -72,7 +79,7 @@ fun SupportView(
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Monospace
-                        )
+                        ),
                     )
                 }
             }
@@ -93,6 +100,9 @@ fun SupportView(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        dialer.openDialer(phoneNumber = "3018")
+                    }
                 ) {
                     Text(
                         text = "30 18",
@@ -110,6 +120,9 @@ fun SupportView(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        dialer.openDialer(phoneNumber = "3114")
+                    }
                 ) {
                     Text(
                         text = "31 14",
@@ -127,6 +140,9 @@ fun SupportView(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        dialer.openDialer(phoneNumber = "3919")
+                    }
                 ) {
                     Text(
                         text = "39 19",
