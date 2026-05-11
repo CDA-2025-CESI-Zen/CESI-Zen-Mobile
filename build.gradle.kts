@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
-    id("org.sonarqube") version "7.3.0.8198"
+    alias(libs.plugins.sonarqube)
 }
 
 sonar {
